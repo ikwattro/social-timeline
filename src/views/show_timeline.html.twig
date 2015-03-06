@@ -1,0 +1,15 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <h1>Timeline for {{ user.property('login') }}</h1>
+
+    {% for friendFeed in timeline %}
+        <div class="row">
+        <h4>{{ friendFeed.feed.title }}</h4>
+        <div class="feed_content">{{ friendFeed.feed.body }}</div>
+        <p>Written by : {{ friendFeed.friend.login }} on {{ friendFeed.feed.timestamp | date('Y-m-d H:i:s') }}</p>
+        </div>
+        <hr/>
+    {% endfor %}
+
+{% endblock %}

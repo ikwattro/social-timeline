@@ -1,0 +1,31 @@
+{
+  "name": "ikwattro/social-demo",
+  "type": "application",
+  "description": "A minimalistic social network with neo4j and php",
+  "keywords": [
+    "graph",
+    "neo4j",
+    "cypher",
+    "social"
+  ],
+  "homepage": "http://www.neoxygen.io",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Christophe Willemsen",
+      "email": "chris@neoxygen.io"
+    }
+  ],
+  "require": {
+    "silex/silex": "~1.1",
+    "twig/twig": ">=1.8,<2.0-dev",
+    "symfony/twig-bridge": "~2.5",
+    "neoxygen/neoclient": "~2.1"
+
+  },
+  "autoload": {
+    "psr-4": {
+      "Ikwattro\\SocialNetwork\\": "src"
+    }
+  }
+}

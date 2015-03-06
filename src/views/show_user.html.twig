@@ -1,0 +1,49 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <h1>User informations</h1>
+
+    <h2>{{ user.property('firstname') }} {{ user.property('lastname') }}</h2>
+    <h3>{{ user.property('login') }}</h3>
+    <p><a href="{{ path('user_feed', {user_login: user.property('login') }) }}">Show feed</a></p>
+    <p><a href="{{ path('user_timeline', {user_login: user.property('login') }) }}">Show timeline</a></p>
+    <hr/>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h4>User <span class="label label-info">{{ user.property('login') }}</span> follows :</h4>
+            <ul class="list-unstyled">
+                {% for follow in followed %}
+                    <li>
+                        {{ follow.property('login') }} ( {{ follow.property('firstname') }} {{ follow.property('lastname') }} )
+                        <form method="POST" action="{{ path('relationship_remove') }}">
+                            <input type="hidden" name="login" value="{{ user.property('login') }}"/>
+                            <input type="hidden" name="to_remove" value="{{ follow.property('login') }}"/>
+                            <button type="submit" class="btn btn-sm btn-warning">Remove relationship</button>
+                        </form>
+                        <hr/>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-sm-6">
+            <h4>Suggestions for user <span class="label label-info">{{ user.property('login') }}</span> </h4>
+            <ul class="list-unstyled">
+                {% for suggested in suggestions %}
+                    <li>
+                        {{ suggested.property('login') }} ( {{ suggested.property('firstname') }} {{ suggested.property('lastname') }} )
+                        <form method="POST" action="{{ path('relationship_create') }}">
+                            <input type="hidden" name="user" value="{{ user.property('login') }}"/>
+                            <input type="hidden" name="to_follow" value="{{ suggested.property('login') }}"/>
+                            <button type="submit" class="btn btn-success btn-sm">Follow</button>
+                        </form>
+                        <hr/>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+{% endblock %}

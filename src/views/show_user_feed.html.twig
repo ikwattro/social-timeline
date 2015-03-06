@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <h1>Feeds for {{ user.property('login') }}</h1>
+
+    {% for feed in feeds %}
+        <div class="row">
+        <h4>{{ feed.property('title') }}</h4>
+        <div class="feed_content">{{ feed.property('body') }}</div>
+        </div>
+        <hr/>
+    {% endfor %}
+
+{% endblock %}
