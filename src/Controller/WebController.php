@@ -33,7 +33,7 @@ class WebController
         $p = ['login' => $login];
         $result = $neo->sendCypherQuery($q, $p)->getResult();
 
-        $user = $result->get('user');
+        $user = $result->getSingle('user');
         $followed = $result->get('followed');
         $suggestions = $result->get('suggestions');
 
@@ -81,13 +81,13 @@ class WebController
         return $application->redirect($redirectRoute);
     }
 
-    public function showUserFeed(Application $application, Request $request)
+    public function showUserPosts(Application $application, Request $request)
     {
         $login = $request->get('user_login');
         $neo = $application['neo'];
         $query = 'MATCH (user:User) WHERE user.login = {login}
-        MATCH (user)-[:LAST_FEED|PREVIOUS_FEED*]->(feed)
-        RETURN user, collect(feed) as feeds';
+        MATCH (user)-[:LAST_POST]->(latest_post)-[PREVIOUS_POST*0..20]->(post)
+        RETURN user, collect(post) as posts';
         $params = ['login' => $login];
         $result = $neo->sendCypherQuery($query, $params)->getResult();
 
@@ -95,11 +95,11 @@ class WebController
             $application->abort(404, 'The user $login was not found');
         }
 
-        $feeds = $result->get('feeds');
+        $posts = $result->get('posts');
 
-        return $application['twig']->render('show_user_feed.html.twig', array(
-            'user' => $result->get('user'),
-            'feeds' => $feeds,
+        return $application['twig']->render('show_user_posts.html.twig', array(
+            'user' => $result->getSingle('user'),
+            'posts' => $posts,
         ));
     }
 
@@ -108,12 +108,12 @@ class WebController
         $login = $request->get('user_login');
         $neo = $application['neo'];
         $query = 'MATCH (user:User) WHERE user.login = {user_login}
-        MATCH (user)-[:FOLLOWS]->(friend)-[:LAST_FEED]->(feed)
-        WITH user, friend, feed
-        ORDER BY feed.timestamp DESC
-        RETURN user, collect({friend: friend, feed: feed}) as timeline
+        MATCH (user)-[:FOLLOWS]->(friend)-[:LAST_POST]->(latest_post)-[:PREVIOUS_POST*0..10]->(post)
+        WITH user, friend, post
+        ORDER BY post.timestamp DESC
         SKIP 0
-        LIMIT 20';
+        LIMIT 20
+        RETURN user, collect({friend: friend, post: post}) as timeline';
         $params = ['user_login' => $login];
         $result = $neo->sendCypherQuery($query, $params)->getResult();
 
@@ -121,14 +121,43 @@ class WebController
             $application->abort(404, 'The user $login was not found');
         }
 
-        $user = $result->get('user');
+        $user = $result->getSingle('user');
         $timeline = $result->get('timeline');
 
         return $application['twig']->render('show_timeline.html.twig', array(
             'user' => $result->get('user'),
             'timeline' => $timeline,
         ));
+    }
 
+    public function newPost(Application $application, Request $request)
+    {
+        $title = $request->get('post_title');
+        $body = $request->get('post_body');
+        $login = $request->get('user_login');
+        $query = 'MATCH (user:User) WHERE user.login = {user_login}
+        OPTIONAL MATCH (user)-[r:LAST_POST]->(oldPost)
+        DELETE r
+        CREATE (p:Post)
+        SET p.title = {post_title}, p.body = {post_body}
+        CREATE (user)-[:LAST_POST]->(p)
+        WITH p, collect(oldPost) as oldLatestPosts
+        FOREACH (x in oldLatestPosts|CREATE (p)-[:PREVIOUS_POST]->(x))
+        RETURN p';
+        $params = [
+            'user_login' => $login,
+            'post_title' => $title,
+            'post_body' => $body
+            ];
+        $result = $application['neo']->sendCypherQuery($query, $params)->getResult();
+        if (null !== $result->getSingle('p')) {
+            $redirectRoute = $application['url_generator']->generate('user_post', array('user_login' => $login));
+
+            return $application->redirect($redirectRoute);
+
+        }
+
+        $application->abort(500, sprintf('There was a problem inserting a new post for user "%s"', $login));
 
     }
 }

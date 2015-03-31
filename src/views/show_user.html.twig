@@ -5,9 +5,28 @@
 
     <h2>{{ user.property('firstname') }} {{ user.property('lastname') }}</h2>
     <h3>{{ user.property('login') }}</h3>
-    <p><a href="{{ path('user_feed', {user_login: user.property('login') }) }}">Show feed</a></p>
+    <p><a href="{{ path('user_post', {user_login: user.property('login') }) }}">Show posts</a></p>
     <p><a href="{{ path('user_timeline', {user_login: user.property('login') }) }}">Show timeline</a></p>
     <hr/>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h5>Add a user status</h5>
+            <form id="new_post" method="POST" action="{{ path('new_post') }}">
+            <div class="form-group">
+                <label for="form_post_title">Post title :</label>
+                <input type="text" minLength="3" name="post_title" id="form_post_title" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label for="form_post_body">Post text :</label>
+                <textarea name="post_body" class="form-control"></textarea>
+            </div>
+            <input type="hidden" name="user_login" value="{{ user.property('login') }}"/>
+            <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+        </div>
+    </div>
+    <hr />
 
     <div class="row">
         <div class="col-sm-6">

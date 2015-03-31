@@ -5,9 +5,9 @@
 
     {% for friendFeed in timeline %}
         <div class="row">
-        <h4>{{ friendFeed.feed.title }}</h4>
-        <div class="feed_content">{{ friendFeed.feed.body }}</div>
-        <p>Written by : {{ friendFeed.friend.login }} on {{ friendFeed.feed.timestamp | date('Y-m-d H:i:s') }}</p>
+        <h4>{{ friendFeed.post.title }}</h4>
+        <div>{{ friendFeed.post.body }}</div>
+        <p>Written by : {{ friendFeed.friend.login }} on {{ friendFeed.post.timestamp | date('Y-m-d H:i:s') }}</p>
         </div>
         <hr/>
     {% endfor %}

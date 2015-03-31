@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <h1>Posts for {{ user.property('login') }}</h1>
+
+    {% for post in posts %}
+        <div class="row">
+        <h4>{{ post.properties.title }}</h4>
+        <div>{{ post.properties.body }}</div>
+        </div>
+        <hr/>
+    {% endfor %}
+
+{% endblock %}

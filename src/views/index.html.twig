@@ -4,7 +4,7 @@
     <ul class="list-unstyled">
         {% for user in users %}
             <li>
-                <a href="{{ path('show_user', { login: user.property('login') }) }}">
+                <a href="{{ path('show_user', { login: user.property('login') | url_encode() }) }}">
                     {{ user.property('firstname') }} {{ user.property('lastname') }}
                 </a>
             </li>

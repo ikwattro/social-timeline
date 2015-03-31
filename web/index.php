@@ -8,7 +8,7 @@ $app = new Silex\Application();
 
 $app['neo'] = $app->share(function(){
     $client = ClientBuilder::create()
-        ->addDefaultLocalConnection()
+        ->addConnection('default', 'http', 'localhost', 7474, true, 'neo4j', 'password')
         ->setAutoFormatResponse(true)
         ->build();
 
@@ -35,10 +35,13 @@ $app->post('/relationship/create', 'Ikwattro\\SocialNetwork\\Controller\\WebCont
 $app->post('/relationship/remove', 'Ikwattro\\SocialNetwork\\Controller\\WebController::removeRelationship')
     ->bind('relationship_remove');
 
-$app->get('/users/{user_login}/feed', 'Ikwattro\\SocialNetwork\\Controller\\WebController::showUserFeed')
-    ->bind('user_feed');
+$app->get('/users/{user_login}/posts', 'Ikwattro\\SocialNetwork\\Controller\\WebController::showUserPosts')
+    ->bind('user_post');
 
 $app->get('/users/{user_login}/timeline', 'Ikwattro\\SocialNetwork\\Controller\\WebController::showUserTimeline')
     ->bind('user_timeline');
+
+$app->post('/new_post', 'Ikwattro\\SocialNetwork\\Controller\\WebController::newPost')
+    ->bind('new_post');
 
 $app->run();
